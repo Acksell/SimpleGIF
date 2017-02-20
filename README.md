@@ -1,5 +1,5 @@
 # SimpleGIF
-Create simple animations in python using lines, circles, functions, polygons and points
+Create simple GIF animations in python using lines, circles, functions, polygons and points
 
 ##Requirements
 None at the moment! I am however looking into optimising the LZW compression with numpy.
@@ -23,15 +23,13 @@ with GIF('BaseLine.gif', WIDTH, HEIGHT) as gif:  # Creates file called BaseLine.
     ### Add the frame
     gif.add_image(frame, delay=0.1) # add several frames to create an animation
 ```
-This is all usually done inside a loop that gradually changes the state of a system.
+This is usually done with a loop that gradually changes the state of a system.
 
 ##Results
 Visualising algorithms
 
-![SierpinskyNodes](doc/Sierpinsky_nodes.gif)
+![SierpinskiNodes](doc/Sierpinski_nodes.gif)
 
 Or animating physical simulations
 
-![LargerBuoyancy](doc/LargerBuoyancy.gif)
-
-![ChargedParticles](doc/ChargedParticles.gif)
+![RandomParticles](doc/RandomParticles.gif)
