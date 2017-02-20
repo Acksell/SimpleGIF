@@ -25,11 +25,11 @@ with GIF('BaseLine.gif', WIDTH, HEIGHT) as gif:  # Creates file called BaseLine.
 ```
 This is usually done with a loop that gradually changes the state of a system.
 
-##Results
+##Applications
 Visualising algorithms
 
-![SierpinskiNodes](doc/Sierpinski_nodes.gif)
+![SierpinskiNodes](doc/Sierpinski.gif)
 
-Or animating physical simulations
+Animating physical simulations
 
-![RandomParticles](doc/RandomParticles.gif)
+![RandomParticles](doc/RandomParticle.gif)
