@@ -32,4 +32,4 @@ Visualising algorithms
 
 Animating physical simulations
 
-![RandomParticles](doc/RandomParticle.gif)
+![RandomParticles](doc/RandomParticles.gif)
