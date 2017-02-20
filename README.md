@@ -1,5 +1,5 @@
-# SimpleGif
-Create simple animations in python using lines, circles, functions, polygons and points.
+# SimpleGIF
+Create simple animations in python using lines, circles, functions, polygons and points
 
 ##Requirements
 None at the moment! I am however looking into optimising the LZW compression with numpy.
