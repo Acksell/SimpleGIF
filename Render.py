@@ -160,29 +160,22 @@ class ConnectPoints(_DrawingObject):
         self.pixels=lines.pixels
 
 class Function(_DrawingObject):
-    CHAR_WHITELIST = '0123456789*+-/()x. '
-    def __init__(self, expr,xmin,xmax, color='black',resolution=1): ### BUG NOTE xmin may be negative
+    def __init__(self, function, xmin,xmax, color='black',resolution=1): ### BUG NOTE xmin may be negative
+        '''Argument function is a standard python function which returns an integer given one as input.'''
+        self.func = function
         _DrawingObject.__init__(self)
         locs=[]
-        for char in expr:
-            if char not in Function.CHAR_WHITELIST:
-                raise SyntaxError('Character %s is not not allowed.' % char)
         for x in range(0,xmax-xmin+1,resolution):
-            temp_expr = expr
-            while 'x' in temp_expr:
-                temp_expr = expr.replace('x',str(x))
-            try:
-                y = eval(temp_expr)
-                locs.append((x+xmin,y))
+            y = function(x)
+            locs.append((x+xmin, y))
             except (SyntaxError,ZeroDivisionError) as err:
                 if err is ZeroDivisionError:
                     # avoid the vertical asymptote line being drawn
                     self.pixels.update(ConnectPoints(locs,color=color).pixels)
                 else:
                     raise err
-        
         self.pixels.update(ConnectPoints(locs,color=color,close=True).pixels)
-
+        
 class Canvas: ### NOTE should make Graphics class that (perhaps inherits from dict) has attribute dictionary and method _set_pixel().
     '''
     Class that renders any _DrawingObject.
