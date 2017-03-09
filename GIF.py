@@ -31,13 +31,13 @@ class GIF:
         
         ### Header
         for char in 'GIF89a':
-            array('B',[ord(char)]).tofile(self.File)
+            self.write('B',[ord(char)])
 
         ### Logical Screen Descriptor
-        array('H',[Width]).tofile(self.File)  # Canvas width
-        array('H',[Height]).tofile(self.File)  # Canvas Height
+        self.write('H',[Width])  # Canvas width
+        self.write('H',[Height])  # Canvas Height
 
-        array('B',[0b11110010]).tofile(self.File) 
+        self.write('B',[0b11110010]) 
         ''' Packed field: 1  111  0  010
                           |  |    |  |_
                           |  |    |_   Size of GCT*
@@ -51,30 +51,37 @@ class GIF:
         *Amount of colors in color table is 2^(n+1).
         '''
         
-        array('B',[0]).tofile(self.File)  # Background Color Index*
+        self.write('B',[0])  # Background Color Index*
         # *Index of color in the global color table (below) that non-assigned pixels take.
-        array('B',[0]).tofile(self.File)  # Pixel Aspect Ratio
+        self.write('B',[0])  # Pixel Aspect Ratio
         
         ### Global Color Table (GCT)
         for colorcode in GIF.GCT:
             for byte in colorcode:
-                array('B',[byte]).tofile(self.File)
+                self.write('B',[byte])
         
         ### Application Extension, allows for animation
-        array('B',[0x21]).tofile(self.File)  # Extension Specifier:Shows that an extension follows
-        array('B',[0xFF]).tofile(self.File)  # Application Extension label
+        self.write('B',[0x21])  # Extension Specifier:Shows that an extension follows
+        self.write('B',[0xFF])  # Application Extension label
         
         app_identifier = 'NETSCAPE'
         app_auth_code = '2.0'
         app = app_identifier + app_auth_code
-        array('B',[len(app)]).tofile(self.File)  # Bytes that follow
+        self.write('B',[len(app)])  # Bytes that follow
         for char in app:
-            array('B',[ord(char)]).tofile(self.File)
+            self.write('B',[ord(char)])
         
-        array('B',[3]).tofile(self.File)  # Bytes that follow
-        array('B',[1]).tofile(self.File)  # Always 1
-        array('H',[self.loops]).tofile(self.File)  # Number of loops, 0 means no restriction.
-        array('B',[0]).tofile(self.File)  # Block terminator, 0 bytes follow
+        self.write('B',[3])  # Bytes that follow
+        self.write('B',[1])  # Always 1
+        self.write('H',[self.loops])  # Number of loops, 0 means no restriction.
+        self.write('B',[0])  # Block terminator, 0 bytes follow
+    
+    def write(self, datatype, bytes_):
+        '''
+        B -> unsigned byte, H -> unsigned short.
+        Full docs at https://docs.python.org/2/library/array.html
+        '''
+        array(datatype, [bytes_]).tofile(self.File)
     
     def __enter__(self):
         return self
@@ -87,49 +94,49 @@ class GIF:
         Few decoders support this feature. 
         The images will often render but they will not display the text.
         '''
-        array('B',[0x21]).tofile(self.File)  # Extension Specifier: Shows that an extension follows
-        array('B',[0x01]).tofile(self.File)  # Plain Text Extension label
-        array('B',[12]).tofile(self.File)  # Block size
-        array('H',[textleft]).tofile(self.File)  # Text left position
-        array('H',[texttop]).tofile(self.File)  # Text right position
-        array('H',[len(text)*8]).tofile(self.File)  # Image Grid Width
-        array('H',[8]).tofile(self.File)  # Image Grid Height
-        array('B',[8]).tofile(self.File)  # Character Cell Width
-        array('B',[8]).tofile(self.File)  # Character Cell Height
-        array('H',[color]).tofile(self.File)  # Font color
-        array('H',[bgcolor]).tofile(self.File)  # Background color
+        self.write('B',[0x21])  # Extension Specifier: Shows that an extension follows
+        self.write('B',[0x01])  # Plain Text Extension label
+        self.write('B',[12])  # Block size
+        self.write('H',[textleft])  # Text left position
+        self.write('H',[texttop])  # Text right position
+        self.write('H',[len(text)*8])  # Image Grid Width
+        self.write('H',[8])  # Image Grid Height
+        self.write('B',[8])  # Character Cell Width
+        self.write('B',[8])  # Character Cell Height
+        self.write('H',[color])  # Font color
+        self.write('H',[bgcolor])  # Background color
         
-        array('B',[0x21]).tofile(self.File)  # Extension Specifier: Shows that an extension follows
+        self.write('B',[0x21])  # Extension Specifier: Shows that an extension follows
         maxbyteFlow = 255
         for i, char in enumerate(text):
             if i % maxbyteFlow == 0:
                 # Bytes that follow
-                array('B',[len(char[i:i+maxbyteFlow])]).tofile(self.File)
-            array('B',[ord(char)]).tofile(self.File)  # Extension Specifier: Shows that an extension follows
-        array('H',[0]).tofile(self.File)  # Extension Specifier: Shows that an extension follows
+                self.write('B',[len(char[i:i+maxbyteFlow])])
+            self.write('B',[ord(char)])  # Extension Specifier: Shows that an extension follows
+        self.write('H',[0])  # Extension Specifier: Shows that an extension follows
         
     
     def add_image(self,canvasobj, imgleft=0, imgtop=0, delay=0.1, overlap=True):        
         ### Graphics Control Extension
-        array('B',[0x21]).tofile(self.File)  # Extension Specifier: Shows that an extension follows
-        array('B',[0xF9]).tofile(self.File)  # Graphics Control Extension label
-        array('B',[4]).tofile(self.File)  # Block size: Number of bytes that follow
-        array('B',[2**(3-overlap)]).tofile(self.File)  # Packed field. Disposal method is set to 1; overlapping
-        array('H',[int(delay*100)]).tofile(self.File)  # Delay time (in 1/100 seconds)
-        array('B',[0]).tofile(self.File)  # Transparent Color Index*
+        self.write('B',[0x21])  # Extension Specifier: Shows that an extension follows
+        self.write('B',[0xF9])  # Graphics Control Extension label
+        self.write('B',[4])  # Block size: Number of bytes that follow
+        self.write('B',[2**(3-overlap)])  # Packed field. Disposal method is set to 1; overlapping
+        self.write('H',[int(delay*100)])  # Delay time (in 1/100 seconds)
+        self.write('B',[0])  # Transparent Color Index*
         # *pixel with this index will appear transparent; background color will show instead.
-        array('B',[0]).tofile(self.File)  # Block terminator, 0 bytes follow
+        self.write('B',[0])  # Block terminator, 0 bytes follow
 
         ### Image descriptor
-        array('B',[0x2C]).tofile(self.File)  # Image separator (comma)
-        array('H',[imgleft]).tofile(self.File)  # Image Left position
-        array('H',[imgtop]).tofile(self.File)  # Image Top position
-        array('H',[canvasobj.Width]).tofile(self.File)  # Image Width
-        array('H',[canvasobj.Height]).tofile(self.File)  # Image Height
-        array('B',[0]).tofile(self.File)  # Packed Field, all subvalues currently set to 0
+        self.write('B',[0x2C])  # Image separator (comma)
+        self.write('H',[imgleft])  # Image Left position
+        self.write('H',[imgtop])  # Image Top position
+        self.write('H',[canvasobj.Width])  # Image Width
+        self.write('H',[canvasobj.Height])  # Image Height
+        self.write('B',[0])  # Packed Field, all subvalues currently set to 0
         
         ### Image data
-        array('B',[3]).tofile(self.File)  # LZW min code size = GCT size+1
+        self.write('B',[3])  # LZW min code size = GCT size+1
         index_stream = canvasobj.get_index_stream()
         print('Compressing...')
         compressed = LZW_compress(index_stream)
@@ -138,12 +145,12 @@ class GIF:
         for i,byte in enumerate(compressed):
             if i % maxbyteFlow == 0:
                 # Bytes that follow
-                array('B',[len(compressed[i:i+maxbyteFlow])]).tofile(self.File)
-            array('B',[byte]).tofile(self.File)
-        array('B',[0]).tofile(self.File)  # Block terminator, 0 bytes follow
+                self.write('B',[len(compressed[i:i+maxbyteFlow])])
+            self.write('B',[byte])
+        self.write('B',[0])  # Block terminator, 0 bytes follow
     
     def end_stream(self):
-        array('B',[0x3B]).tofile(self.File)
+        self.write('B',[0x3B])
         self.File.close()
             
 if __name__ == '__main__':
